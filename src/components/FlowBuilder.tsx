@@ -11,14 +11,16 @@ import ReactFlow, {
   Node,
   OnNodesChange,
   Connection,
+  BackgroundVariant,
 } from "reactflow";
 
 import "reactflow/dist/style.css";
+import { Data } from "../types/types";
 
 const initialEdges: Edge[] = [];
 
 // Custom node component
-const CustomNode = ({ data }) => {
+const CustomNode = ({ data }: { data: Data }) => {
   return (
     <div className="rounded-lg shadow-2xl bg-white w-64">
       <div className="rounded-t-lg py-2 bg-green-200 px-1 flex justify-between items-center">
@@ -96,7 +98,7 @@ const FlowBuilder = ({
         onConnect={onConnect}
         nodeTypes={nodeTypes}
       >
-        <Background variant="dots" gap={12} size={1} />
+        <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       </ReactFlow>
     </div>
   );
