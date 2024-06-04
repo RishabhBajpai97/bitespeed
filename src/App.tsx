@@ -1,4 +1,4 @@
-import { Node, useNodesState } from "reactflow";
+import { Node, ReactFlowProvider, useNodesState } from "reactflow";
 import FlowBuilder from "./components/FlowBuilder";
 import SideBar from "./components/SideBar";
 import TopBar from "./components/TopBar";
@@ -10,18 +10,21 @@ export default function App() {
 
   return (
     <div className="flex flex-col w-full h-full overflow-scroll">
-      <TopBar />
-      <div className="flex w-full">
-        <div className="flex-grow overflow-auto">
-          <FlowBuilder
-            nodes={nodes}
-            onNodesChange={onNodesChange}
-          />
+      <ReactFlowProvider>
+        <TopBar />
+        <div className="flex w-full">
+          <div className="flex-grow overflow-auto">
+            <FlowBuilder
+              nodes={nodes}
+              onNodesChange={onNodesChange}
+              setNodes={setNodes}
+            />
+          </div>
+          <div className="w-[20%]">
+            <SideBar nodes={nodes} />
+          </div>
         </div>
-        <div className="w-[20%]">
-          <SideBar setNodesHandler={setNodes} nodes={nodes} />
-        </div>
-      </div>
+      </ReactFlowProvider>
     </div>
   );
 }
