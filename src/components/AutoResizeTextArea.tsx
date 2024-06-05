@@ -5,7 +5,7 @@ import {
   Dispatch,
   SetStateAction,
 } from "react";
-
+//TextArea with auto resize
 const AutoResizeTextarea = ({
   text,
   setText,

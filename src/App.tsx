@@ -1,30 +1,26 @@
-import { Node, ReactFlowProvider, useNodesState } from "reactflow";
-import FlowBuilder from "./components/FlowBuilder";
-import SideBar from "./components/SideBar";
-import TopBar from "./components/TopBar";
-
-const initialNodes: Node[] = [];
+import Builder from "./components/Builder";
+import { Toaster } from "react-hot-toast";
 
 export default function App() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-
   return (
-    <div className="flex flex-col w-full h-full overflow-scroll">
-      <ReactFlowProvider>
-        <TopBar />
-        <div className="flex w-full">
-          <div className="flex-grow overflow-auto">
-            <FlowBuilder
-              nodes={nodes}
-              onNodesChange={onNodesChange}
-              setNodes={setNodes}
-            />
-          </div>
-          <div className="w-[20%]">
-            <SideBar nodes={nodes} />
-          </div>
-        </div>
-      </ReactFlowProvider>
-    </div>
+    <>
+      <Builder />
+      <Toaster
+        toastOptions={{
+          error: {
+            style: {
+              background: "red",
+              color: "white",
+            },
+          },
+          success: {
+            style: {
+              background: "green",
+              color: "white",
+            },
+          },
+        }}
+      />
+    </>
   );
 }

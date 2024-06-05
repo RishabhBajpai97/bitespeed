@@ -1,5 +1,3 @@
-import { ChatCircleText, WhatsappLogo } from "@phosphor-icons/react";
-import { UserSound } from "@phosphor-icons/react/dist/ssr";
 import {
   Dispatch,
   DragEvent,
@@ -11,9 +9,7 @@ import ReactFlow, {
   Background,
   useEdgesState,
   addEdge,
-  Handle,
   Edge,
-  Position,
   Node,
   OnNodesChange,
   Connection,
@@ -21,77 +17,10 @@ import ReactFlow, {
 } from "reactflow";
 
 import "reactflow/dist/style.css";
-import { Data } from "../types/types";
 import { useStore } from "../store/store";
-
-const initialEdges: Edge[] = [];
+import CustomNode from "./CustomNode";
 
 // Custom node component
-const CustomNode = ({ data }: { data: Data }) => {
-  const renderNode = () => {
-    if (data.label == "") {
-      switch (data.interactionType) {
-        case "message":
-          return "Text Node";
-        case "voice":
-          return "Voice Node";
-      }
-    } else {
-      return data.label;
-    }
-  };
-  return (
-    <div
-      className={`rounded-lg shadow-2xl border-2 bg-white w-64 ${
-        data.selected ? "border-violet-600" : ""
-      }`}
-    >
-      <div className="rounded-t-lg py-2 bg-green-200 px-1 flex justify-between items-center">
-        <div className="flex items-center">
-          {data.interactionType === "message" ? (
-            <ChatCircleText size={16} />
-          ) : (
-            <UserSound size={16} />
-          )}
-          <b className="text-sm ml-2">
-            {data.interactionType === "message" ? "Send Message" : "Send Audio"}
-          </b>
-        </div>
-        <div>
-          <WhatsappLogo size={16} color="#3aa15e" weight="fill" />
-        </div>
-      </div>
-      <div className="rounded-b-lg text-start ml-1 py-2">
-        {/* {data.label == "" ? "Text Node" : data.label} */}
-        {renderNode()}
-      </div>
-      <Handle
-        type="target"
-        position={Position.Left}
-        id={data.handles[0]}
-        style={{
-          width: "10px",
-          height: "10px",
-          backgroundColor: "black",
-          borderRadius: "50%",
-          border: "2px solid white",
-        }}
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        id={data.handles[1]}
-        style={{
-          width: "10px",
-          height: "10px",
-          backgroundColor: "black",
-          borderRadius: "50%",
-          border: "2px solid white",
-        }}
-      />
-    </div>
-  );
-};
 
 const nodeTypes = {
   customNode: CustomNode,
@@ -106,13 +35,20 @@ const FlowBuilder = ({
   onNodesChange: OnNodesChange;
   setNodes: Dispatch<SetStateAction<Node<unknown, string | undefined>[]>>;
 }) => {
+  const initialEdges: Edge[] = [];
+
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [connectedSources, setConnectedSources] = useState([]);
+
   const setBackButton = useStore((state) => state.setBackButton);
   const setInteractionType = useStore((state) => state.setInteractionType);
 
+  //handles node connection event
+
   const onConnect = useCallback(
     (params: Edge | Connection) => {
+      //below logic checks whether there is already an edge created from this source
+      // If it has been created then do nothing. Otherwise add data to edges.
       const source = params.source;
       const isSourceConnected = connectedSources.includes(source as never);
 
@@ -125,6 +61,9 @@ const FlowBuilder = ({
     },
     [setEdges, connectedSources]
   );
+
+  //handle click on nodes
+
   const handleNodeClick = (_: unknown, node: Node) => {
     setNodes((nodes) => {
       return nodes.map((n) => ({
@@ -139,9 +78,12 @@ const FlowBuilder = ({
     setInteractionType(node.data.interactionType);
   };
 
+  //handles drop element in builder region
+
   const handleDrop = (e: DragEvent) => {
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData("application/json"));
+    // Adds a new node with empty label
     setNodes((nodes) => [
       ...nodes,
       {
@@ -151,7 +93,7 @@ const FlowBuilder = ({
           y: e.clientY - window.innerHeight * 0.14,
         },
         data: {
-          label: "",
+          label: data["type"]==="message"?"Text Node":"Voice Node",
           handles: [`${Date.now().toString()}a`, `${Date.now().toString()}b`],
           initialNode: nodes.length === 0 ? true : false,
           interactionType: data["type"],
@@ -164,7 +106,7 @@ const FlowBuilder = ({
 
   return (
     <div
-      className="flex-grow overflow-auto h-screen"
+      className="flex-grow h-screen"
       onDrop={handleDrop}
       onDragOver={(event) => event.preventDefault()}
     >
