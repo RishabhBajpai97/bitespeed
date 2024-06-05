@@ -83,7 +83,7 @@ const FlowBuilder = ({
   const handleDrop = (e: DragEvent) => {
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData("application/json"));
-    // Adds a new node with empty label
+    // Adds a new node with default label
     setNodes((nodes) => [
       ...nodes,
       {
